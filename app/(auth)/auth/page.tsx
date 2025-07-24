@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 "use client";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChevronLeft, Key, ShoppingBag, Star } from "lucide-react";
@@ -13,7 +13,10 @@ import axiosInstance from "@/utils/axiosInstance"; // Import the Axios instance
 import { AuthContext } from "@/context/AuthContext";
 import env from "@/utils/env";
 
-const Auth = () => {
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+const AuthContent = () => {
   const [isSignup, setIsSignup] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [Error, setError] = useState<string | null>(null);
@@ -372,6 +375,18 @@ const Auth = () => {
         </motion.div>
       </div>
     </div>
+  );
+};
+
+const Auth = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-300">Loading...</div>
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   );
 };
 

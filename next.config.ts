@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       // add other domains as needed
     ],
   },
+  // Disable static optimization for dynamic pages
+  output: 'standalone',
 };
 
 export default nextConfig;

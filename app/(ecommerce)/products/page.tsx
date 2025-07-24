@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axiosInstance from "@/utils/axiosInstance";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 const PAGE_SIZE = 12;
 const FETCH_SIZE = 1000; // Fetch a large pool for true randomization
 
-const ProductsPage = () => {
+const ProductsPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
@@ -158,6 +161,18 @@ const ProductsPage = () => {
         </Button>
       </nav>
     </div>
+  );
+};
+
+const ProductsPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-300">Loading products...</div>
+      </div>
+    }>
+      <ProductsPageContent />
+    </Suspense>
   );
 };
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
@@ -17,19 +17,22 @@ import {
   FaArrowLeft, 
   FaCreditCard, 
   FaPaypal, 
-  FaApplePay, 
+  FaApplePay,
   FaMobile,
   FaLock,
   FaShieldAlt,
   FaTruck
 } from "react-icons/fa";
 import Image from "next/image";
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
 // Import payment components
 import PayPalPayment from "@/components/payments/PayPalPayment";
 import ApplePayPayment from "@/components/payments/ApplePayPayment";
 import FawryPayment from "@/components/payments/FawryPayment";
 
-const CheckoutPage = () => {
+const CheckoutPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { cart, clearCart } = useCart();
@@ -783,6 +786,18 @@ const CheckoutPage = () => {
           </motion.div>
       </AnimatePresence>
     </div>
+  );
+};
+
+const CheckoutPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-300">Loading checkout...</div>
+      </div>
+    }>
+      <CheckoutPageContent />
+    </Suspense>
   );
 };
 

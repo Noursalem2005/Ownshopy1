@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 const categories = [
   "All",
   "Clothing",
