@@ -294,7 +294,7 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto pt-16 px-2 sm:px-4 pb-8">
+    <div className="max-w-7xl mx-auto pt-16 px-2 mt-5 m:px-4 pb-8">
       <motion.button
         className="mb-6 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-bold text-lg"
         onClick={() => router.back()}

@@ -25,7 +25,14 @@ function groupByCategory(products: any[]) {
 const CatalogPage = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const [windowWidth, setWindowWidth] = useState<number>(1200);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Handle hydration and window width
+  useEffect(() => {
+    setIsHydrated(true);
+    setWindowWidth(window.innerWidth);
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -47,10 +54,12 @@ const CatalogPage = () => {
 
   // Track window width for responsive logic
   useEffect(() => {
+    if (!isHydrated) return;
+    
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [isHydrated]);
 
   const grouped = useMemo(() => groupByCategory(products), [products]);
 
@@ -86,15 +95,15 @@ const CatalogPage = () => {
               .map((_, idx) => (
                 <motion.div
                   key={idx}
-                  className="bg-gray-800 dark:bg-gray-800 light:bg-card rounded-xl shadow-lg p-4 animate-pulse h-[340px] border border-gray-700 dark:border-gray-700 light:border-border"
+                  className="bg-gray-800 rounded-xl shadow-lg p-4 animate-pulse h-[340px]"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
                 >
-                  <div className="w-full h-48 bg-gray-700 dark:bg-gray-700 light:bg-muted rounded-md mb-4"></div>
-                  <div className="h-4 bg-gray-700 dark:bg-gray-700 light:bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-700 dark:bg-gray-700 light:bg-muted rounded w-1/2 mb-2"></div>
-                  <div className="h-4 bg-gray-700 dark:bg-gray-700 light:bg-muted rounded w-1/3"></div>
+                  <div className="w-full h-48 bg-gray-700 rounded-md mb-4"></div>
+                  <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/3"></div>
                 </motion.div>
               ))}
           </motion.div>
@@ -105,7 +114,7 @@ const CatalogPage = () => {
 
   if (!products.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-blue-500">
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-[#00ffff]">
         <p className="text-2xl font-bold">No products found.</p>
       </div>
     );
@@ -117,7 +126,7 @@ const CatalogPage = () => {
       <div className="flex justify-center mb-10">
         <button
           onClick={() => window.location.href = '/products'}
-          className="px-8 py-3 rounded-full bg-[#00ffff] dark:bg-[#00ffff] light:bg-primary text-gray-900 dark:text-gray-900 light:text-primary-foreground font-extrabold text-lg shadow-lg border-2 border-[#00ffff] dark:border-[#00ffff] light:border-primary hover:bg-[#00cccc] dark:hover:bg-[#00cccc] light:hover:bg-primary/90 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#00ffff80] dark:focus:ring-[#00ffff80] light:focus:ring-primary/50 animate-pulse"
+          className="px-8 py-3 rounded-full bg-[#00ffff] text-gray-900 font-extrabold text-lg shadow-lg border-2 border-[#00ffff] hover:bg-[#00cccc] hover:border-[#00cccc] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-[#00ffff80] animate-pulse"
           style={{ boxShadow: '0 0 24px #00ffff80' }}
         >
           Explore All Products
@@ -130,8 +139,8 @@ const CatalogPage = () => {
         return (
           <section key={category} className="mb-12">
             <h2 className="flex items-center text-lg sm:text-xl md:text-2xl font-bold mb-4">
-              <span className="inline-block w-2 h-8 bg-primary rounded-l-md mr-3 shadow-lg"></span>
-              <span className="bg-card/80 px-4 py-2 rounded-md shadow text-primary tracking-wide border border-border">
+              <span className="inline-block w-2 h-8 bg-[#00ffff] rounded-l-md mr-3 shadow-lg"></span>
+              <span className="bg-gray-800/80 px-4 py-2 rounded-md shadow text-[#00ffff] tracking-wide">
                 {category}
               </span>
             </h2>
@@ -159,7 +168,7 @@ const CatalogPage = () => {
                     />
                     {isLast && (
                       <button
-                        className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-xl text-3xl font-bold text-primary hover:bg-primary/30 transition cursor-pointer border-2 border-primary focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-xl text-3xl font-bold text-[#00ffff] hover:bg-[#00ffff30] transition cursor-pointer border-2 border-[#00ffff] focus:outline-none focus:ring-2 focus:ring-[#00ffff80]"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.location.href = '/products';

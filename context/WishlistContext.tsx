@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import axiosInstance from "@/utils/axiosInstance";
 import { useAuth } from "@/context/AuthContext";
 
@@ -19,16 +19,13 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
-  // Fetch wishlist on mount and when user changes
-  useEffect(() => {
-    if (user) {
-      refreshWishlist();
-    } else {
+  const refreshWishlist = useCallback(async () => {
+    if (!user) {
+      // If no user, set empty wishlist without making API call
       setWishlist(new Set());
+      return;
     }
-  }, [user]);
-
-  const refreshWishlist = async () => {
+    
     try {
       const res = await axiosInstance.get("/api/profile/wishlist");
       const ids = (res.data?.wishlist || []).map((item: any) => item._id || item.productId || item);
@@ -36,22 +33,51 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       setWishlist(new Set());
     }
-  };
+  }, [user]);
+
+  // Fetch wishlist on mount and when user changes
+  useEffect(() => {
+    if (user) {
+      refreshWishlist();
+    } else {
+      setWishlist(new Set());
+    }
+  }, [user, refreshWishlist]);
 
   const isWished = (id: string) => wishlist.has(id);
 
   const addToWishlist = async (id: string) => {
-    await axiosInstance.post("/api/profile/wishlist", { productId: id });
-    setWishlist((prev) => new Set(prev).add(id));
+    if (!user) {
+      // For guest users, don't make API call or show error
+      return;
+    }
+    
+    try {
+      await axiosInstance.post("/api/profile/wishlist", { productId: id });
+      setWishlist((prev) => new Set(prev).add(id));
+    } catch (error) {
+      // Silently handle errors for wishlist operations
+      console.error('Failed to add to wishlist:', error);
+    }
   };
 
   const removeFromWishlist = async (id: string) => {
-    await axiosInstance.delete(`/api/profile/wishlist/${id}`);
-    setWishlist((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+    if (!user) {
+      // For guest users, don't make API call or show error
+      return;
+    }
+    
+    try {
+      await axiosInstance.delete(`/api/profile/wishlist/${id}`);
+      setWishlist((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    } catch (error) {
+      // Silently handle errors for wishlist operations
+      console.error('Failed to remove from wishlist:', error);
+    }
   };
 
   const clearWishlist = () => setWishlist(new Set());

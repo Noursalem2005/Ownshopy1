@@ -6,13 +6,11 @@ const layout = ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-  return (
-    <div className="min-h-screen bg-slate-900">
-      <Navbar />
-      <main className="pt-16">
-        {children}
-      </main>
-      <Footer />
+  return (  <div>
+    <Navbar />
+    <div className=""></div>
+    {children}
+    <Footer />
     </div>
   )
 }

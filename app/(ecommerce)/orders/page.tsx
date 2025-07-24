@@ -28,6 +28,12 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Ensure hydration is complete
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -40,7 +46,13 @@ const OrdersPage = () => {
         const queryString = params.toString();
         response = await axiosInstance.get(`/api/orders${queryString ? `?${queryString}` : ''}`);
       } else {
-        // Guest user - try to get email from localStorage or session
+        // Guest user - try to get email from localStorage or session (only after hydration)
+        if (!isHydrated) {
+          setOrders([]);
+          setLoading(false);
+          return;
+        }
+        
         const guestEmail = localStorage.getItem('guestEmail') || sessionStorage.getItem('guestEmail');
         console.log("Fetching guest orders for email:", guestEmail);
         if (guestEmail) {
@@ -60,12 +72,14 @@ const OrdersPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, isHydrated]);
 
   // Fetch user orders
   useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+    if (isHydrated) {
+      fetchOrders();
+    }
+  }, [fetchOrders, isHydrated]);
 
   const getStatusIcon = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -159,7 +173,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto pt-16 px-2 sm:px-4 pb-8">
+    <div className="max-w-6xl mx-auto mt-5 pt-16 px-2 sm:px-4 pb-8 overflow-hidden">
       <motion.button
         className="mb-6 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-bold text-lg"
         onClick={() => router.back()}
@@ -169,9 +183,9 @@ const OrdersPage = () => {
         <FaArrowLeft /> Back
       </motion.button>
 
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
         <motion.h1
-          className="text-2xl sm:text-3xl font-extrabold text-[#00ffff] tracking-tight"
+          className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#00ffff] tracking-tight break-words"
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
@@ -182,7 +196,7 @@ const OrdersPage = () => {
         <Button
           onClick={fetchOrders}
           variant="outline"
-          className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20"
+          className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20 text-sm shrink-0"
           disabled={loading}
         >
           {loading ? "Refreshing..." : "Refresh"}
@@ -197,63 +211,66 @@ const OrdersPage = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
+            className="space-y-6 relative"
           >
-            <div className="flex items-center justify-between">
+            {/* Status badge in top-right corner */}
+            <div className={`absolute top-0 right-0 px-3 py-1 rounded-full border text-xs sm:text-sm font-medium ${getStatusColor(selectedOrder.status)} whitespace-nowrap z-20`}>
+              {getStatusIcon(selectedOrder.status)}
+              <span className="ml-2">{selectedOrder.status}</span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pr-24">
               <Button
                 onClick={() => setSelectedOrder(null)}
                 variant="outline"
-                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20"
+                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20 text-sm"
               >
                 <FaArrowLeft className="mr-2" /> Back to Orders
               </Button>
-              <div className={`px-3 py-1 rounded-full border text-sm font-medium ${getStatusColor(selectedOrder.status)}`}>
-                {getStatusIcon(selectedOrder.status)}
-                <span className="ml-2">{selectedOrder.status}</span>
-              </div>
             </div>
 
             {/* Order Info */}
             <Card className="bg-gray-900 border-cyan-400/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300 flex items-center gap-2">
-                  <FaBox /> Order #{selectedOrder._id?.slice(-8)}
+                <CardTitle className="text-cyan-300 flex items-center gap-2 text-lg break-words">
+                  <FaBox className="shrink-0" /> 
+                  <span className="break-all">Order #{selectedOrder._id?.slice(-8)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h3 className="font-bold text-white mb-2">Order Date</h3>
-                    <p className="text-gray-300">{formatDate(selectedOrder.placedAt || selectedOrder.createdAt)}</p>
+                    <h3 className="font-bold text-white mb-2 text-sm sm:text-base">Order Date</h3>
+                    <p className="text-gray-300 text-sm break-words">{formatDate(selectedOrder.placedAt || selectedOrder.createdAt)}</p>
                   </div>
                   <div>
-                    <h3 className="font-bold text-white mb-2">Total Amount</h3>
+                    <h3 className="font-bold text-white mb-2 text-sm sm:text-base">Total Amount</h3>
                     <p className="text-cyan-300 font-bold text-lg">${selectedOrder.total?.toFixed(2)}</p>
                   </div>
                 </div>
 
                 {/* Tracking Progress */}
                 <div className="mt-6">
-                  <h3 className="font-bold text-white mb-4">Order Progress</h3>
-                  <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-white mb-4 text-sm sm:text-base">Order Progress</h3>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-2">
                     {getTrackingSteps(selectedOrder.status).map((step, index) => (
-                      <div key={step.key} className="flex flex-col items-center flex-1">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                      <div key={step.key} className="flex items-center sm:flex-col gap-3 sm:gap-2 flex-1 w-full sm:w-auto">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 shrink-0 ${
                           step.completed 
                             ? 'bg-cyan-400 border-cyan-400 text-black' 
                             : step.active 
                               ? 'border-cyan-400 text-cyan-400 bg-cyan-400/20'
                               : 'border-gray-600 text-gray-400'
                         }`}>
-                          <step.icon />
+                          <step.icon className="text-xs sm:text-sm" />
                         </div>
-                        <div className={`text-xs mt-2 text-center ${
+                        <div className={`text-xs sm:text-sm text-left sm:text-center ${
                           step.completed || step.active ? 'text-cyan-300' : 'text-gray-500'
                         }`}>
                           {step.label}
                         </div>
                         {index < getTrackingSteps(selectedOrder.status).length - 1 && (
-                          <div className={`absolute h-0.5 w-full top-5 left-1/2 -z-10 ${
+                          <div className={`hidden sm:block absolute h-0.5 w-full top-5 left-1/2 -z-10 ${
                             step.completed ? 'bg-cyan-400' : 'bg-gray-600'
                           }`} />
                         )}
@@ -267,20 +284,20 @@ const OrdersPage = () => {
             {/* Shipping Address */}
             <Card className="bg-gray-900 border-cyan-400/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300 flex items-center gap-2">
-                  <FaShippingFast /> Shipping Address
+                <CardTitle className="text-cyan-300 flex items-center gap-2 text-lg">
+                  <FaShippingFast className="shrink-0" /> Shipping Address
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-gray-300">
-                  <p className="font-semibold text-white">
+                <div className="text-gray-300 space-y-1">
+                  <p className="font-semibold text-white break-words">
                     {selectedOrder.shippingAddress?.firstName} {selectedOrder.shippingAddress?.lastName}
                   </p>
-                  <p>{selectedOrder.shippingAddress?.address}</p>
-                  <p>
+                  <p className="break-words">{selectedOrder.shippingAddress?.address}</p>
+                  <p className="break-words">
                     {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state} {selectedOrder.shippingAddress?.zipCode}
                   </p>
-                  <p>{selectedOrder.shippingAddress?.country}</p>
+                  <p className="break-words">{selectedOrder.shippingAddress?.country}</p>
                 </div>
               </CardContent>
             </Card>
@@ -288,27 +305,27 @@ const OrdersPage = () => {
             {/* Order Items */}
             <Card className="bg-gray-900 border-cyan-400/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300">Items Ordered</CardTitle>
+                <CardTitle className="text-cyan-300 text-lg">Items Ordered</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {selectedOrder.items?.map((item: any, index: number) => {
                     const product = item.product;
                     return (
-                      <div key={index} className="flex items-center gap-4 p-3 bg-gray-800 rounded-lg">
+                      <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 bg-gray-800 rounded-lg">
                         <Image
                           src={product?.image || "/default-product.png"}
                           alt={product?.title || "Product"}
                           width={60}
                           height={60}
-                          className="w-15 h-15 object-cover rounded"
+                          className="w-12 h-12 sm:w-15 sm:h-15 object-cover rounded shrink-0 mx-auto sm:mx-0"
                         />
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-white">{product?.title}</h4>
-                          <p className="text-gray-400 text-sm">Quantity: {item.quantity}</p>
-                          <p className="text-cyan-300 font-bold">${item.price?.toFixed(2)} each</p>
+                        <div className="flex-1 min-w-0 text-center sm:text-left">
+                          <h4 className="font-semibold text-white text-sm break-words">{product?.title}</h4>
+                          <p className="text-gray-400 text-xs sm:text-sm">Quantity: {item.quantity}</p>
+                          <p className="text-cyan-300 font-bold text-sm">${item.price?.toFixed(2)} each</p>
                         </div>
-                        <div className="text-cyan-300 font-bold">
+                        <div className="text-cyan-300 font-bold text-sm shrink-0">
                           ${(item.price * item.quantity).toFixed(2)}
                         </div>
                       </div>
@@ -319,7 +336,7 @@ const OrdersPage = () => {
                 <Separator className="bg-gray-700 my-4" />
 
                 {/* Order Summary */}
-                <div className="space-y-2">
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-300">
                     <span>Subtotal:</span>
                     <span>${selectedOrder.subtotal?.toFixed(2)}</span>
@@ -333,7 +350,7 @@ const OrdersPage = () => {
                     <span>${selectedOrder.tax?.toFixed(2)}</span>
                   </div>
                   <Separator className="bg-gray-700" />
-                  <div className="flex justify-between text-lg font-bold text-white">
+                  <div className="flex justify-between text-base sm:text-lg font-bold text-white">
                     <span>Total:</span>
                     <span className="text-cyan-300">${selectedOrder.total?.toFixed(2)}</span>
                   </div>
@@ -351,23 +368,23 @@ const OrdersPage = () => {
           >
             {orders.length === 0 ? (
               <motion.div
-                className="text-center py-12"
+                className="text-center py-12 px-4"
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <FaBox className="text-6xl text-gray-500 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-gray-400 mb-2">No orders yet</h2>
-                <p className="text-gray-500 mb-2">When you place orders, they&apos;ll appear here.</p>
-                {!user && (
-                  <p className="text-xs text-gray-600 mb-4">
+                <FaBox className="text-4xl sm:text-6xl text-gray-500 mx-auto mb-4" />
+                <h2 className="text-lg sm:text-xl font-bold text-gray-400 mb-2">No orders yet</h2>
+                <p className="text-gray-500 mb-2 text-sm sm:text-base">When you place orders, they&apos;ll appear here.</p>
+                {!user && isHydrated && (
+                  <p className="text-xs text-gray-600 mb-4 break-words">
                     Guest email: {localStorage.getItem('guestEmail') || 'Not set'}
                   </p>
                 )}
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={() => router.push("/")} className="bg-cyan-500 hover:bg-cyan-600">
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button onClick={() => router.push("/")} className="bg-cyan-500 hover:bg-cyan-600 text-sm">
                     Start Shopping
                   </Button>
-                  <Button onClick={fetchOrders} variant="outline" className="border-cyan-400 text-cyan-400">
+                  <Button onClick={fetchOrders} variant="outline" className="border-cyan-400 text-cyan-400 text-sm">
                     Refresh Orders
                   </Button>
                 </div>
@@ -381,32 +398,34 @@ const OrdersPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card className="bg-gray-900 border-cyan-400/30 hover:border-cyan-400/50 transition-colors cursor-pointer">
-                      <CardContent className="p-6">
+                    <Card className="bg-gray-900 border-cyan-400/30 hover:border-cyan-400/50 transition-colors cursor-pointer relative">
+                      {/* Status badge in top-right corner */}
+                      <div className={`absolute top-3 right-3 px-2 py-1 rounded-full border text-xs font-medium ${getStatusColor(order.status)} z-10`}>
+                        {getStatusIcon(order.status)}
+                        <span className="ml-1">{order.status}</span>
+                      </div>
+                      
+                      <CardContent className="p-6 pr-20">
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-bold text-white">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-2 mb-2">
+                              <h3 className="font-bold text-white break-all text-sm sm:text-base">
                                 Order #{order._id?.slice(-8)}
                               </h3>
-                              <div className={`px-2 py-1 rounded-full border text-xs font-medium ${getStatusColor(order.status)}`}>
-                                {getStatusIcon(order.status)}
-                                <span className="ml-1">{order.status}</span>
-                              </div>
                             </div>
-                            <p className="text-gray-400 text-sm mb-2">
+                            <p className="text-gray-400 text-xs sm:text-sm mb-2 break-words">
                               Placed on {formatDate(order.placedAt || order.createdAt)}
                             </p>
-                            <p className="text-cyan-300 font-bold">
+                            <p className="text-cyan-300 font-bold text-sm sm:text-base">
                               ${order.total?.toFixed(2)}
                             </p>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
                             <Button
                               onClick={() => setSelectedOrder(order)}
                               variant="outline"
                               size="sm"
-                              className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20"
+                              className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/20 text-xs sm:text-sm flex-1 sm:flex-none"
                             >
                               <FaEye className="mr-1" /> View Details
                             </Button>

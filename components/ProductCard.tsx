@@ -88,6 +88,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { addToCart } = useCart();
   const { user } = useAuth();
   const [showSignIn, setShowSignIn] = React.useState(false);
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  // Ensure hydration is complete before rendering wishlist state
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  // Only check wishlist status after hydration
+  const isInWishlist = isHydrated ? isWished(_id) : false;
 
   // Wishlist handler using global state
   const handleAddToWishlist = async (e: React.MouseEvent) => {
@@ -96,7 +105,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       setShowSignIn(true);
       return;
     }
-    if (!isWished(_id)) {
+    if (!isInWishlist) {
       try {
         await addToWishlist(_id);
         toast.success("Added to wishlist!");
@@ -131,7 +140,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <>
       <motion.div
-        className="relative bg-gray-800 dark:bg-gray-800 light:bg-card rounded-xl shadow-lg overflow-hidden group cursor-default transition-all flex flex-col h-full"
+        className="relative bg-gray-800 rounded-xl shadow-lg overflow-hidden group cursor-default transition-all flex flex-col h-full"
         whileHover={{ scale: 1.04, boxShadow: "0 8px 32px #00ffff40" }}
         whileTap={{ scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -141,21 +150,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Heart (wishlist) button */}
           <button
             className={`absolute top-3 right-3 z-30 rounded-full p-2 transition cursor-pointer shadow-md border ${
-              isWished(_id)
+              isInWishlist
                 ? "bg-pink-500 border-pink-500 ring-2 ring-pink-400"
                 : "bg-white/80 border-pink-300 hover:bg-pink-200"
             }`}
             onClick={handleAddToWishlist}
             aria-label="Add to wishlist"
           >
-            {isWished(_id) ? (
+            {isInWishlist ? (
               <FaHeart className="text-white drop-shadow-lg" />
             ) : (
               <FaRegHeart className="text-pink-500" />
             )}
           </button>
           {/* Image with larger height, object-contain, and centering, using Next.js Image */}
-          <div className="w-full h-64 bg-gray-700 dark:bg-gray-700 light:bg-muted rounded-t-xl overflow-hidden flex items-center justify-center">
+          <div className="w-full h-64 bg-gray-700 rounded-t-xl overflow-hidden flex items-center justify-center">
             <Image
               src={image}
               alt={title}
@@ -168,7 +177,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           {/* Category badge */}
           {category && (
-            <span className="absolute top-3 left-3 bg-[#00ffff] dark:bg-[#00ffff] light:bg-primary text-gray-900 dark:text-gray-900 light:text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow">
+            <span className="absolute top-3 left-3 bg-[#00ffff] text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow">
               {category}
             </span>
           )}
@@ -179,25 +188,25 @@ const ProductCard: React.FC<ProductCardProps> = ({
               initial={false}
               animate={false}
             >
-              <p className="text-sm text-[#00ffff] dark:text-[#00ffff] light:text-primary text-center break-words line-clamp-3">
+              <p className="text-sm text-[#00ffff] text-center break-words line-clamp-3">
                 {description}
               </p>
             </motion.div>
           )}
         </div>
         <div className="p-4 flex-1 flex flex-col justify-between">
-          <h3 className="text-lg font-bold text-white dark:text-white light:text-card-foreground mb-1 line-clamp-2">
+          <h3 className="text-lg font-bold text-white mb-1 line-clamp-2">
             {title}
           </h3>
           {/* Star rating */}
           {rating && (
             <div className="flex items-center mt-1">
               {renderStars(rating)}
-              <span className="ml-2 text-xs text-gray-400 dark:text-gray-400 light:text-muted-foreground">{rating}</span>
+              <span className="ml-2 text-xs text-gray-400">{rating}</span>
             </div>
           )}
           <div className="flex items-center justify-between mt-auto">
-            <span className="text-xl font-bold text-[#00ffff] dark:text-[#00ffff] light:text-primary">
+            <span className="text-xl font-bold text-[#00ffff]">
               {price !== undefined && price !== null && price !== ""
                 ? `${price}`
                 : "No price"}

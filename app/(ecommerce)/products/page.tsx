@@ -16,15 +16,48 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [totalPages, setTotalPages] = useState(1);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Ensure hydration is complete
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
+    
+    // Deterministic shuffle function based on seed
+    const deterministicShuffle = (array: any[], seed: number) => {
+      const shuffled = [...array];
+      let currentIndex = shuffled.length;
+      let randomIndex;
+
+      // Simple seeded random number generator
+      const seededRandom = (seedValue: number) => {
+        const x = Math.sin(seedValue) * 10000;
+        return x - Math.floor(x);
+      };
+
+      while (currentIndex !== 0) {
+        randomIndex = Math.floor(seededRandom(seed + currentIndex) * currentIndex);
+        currentIndex--;
+        [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+      }
+
+      return shuffled;
+    };
+    
     setLoading(true);
     axiosInstance
       .get(`/api/products?page=1&limit=${FETCH_SIZE}`)
       .then((res) => {
-        // Shuffle all products for random order
         const allProds = res.data.products || [];
-        const shuffled = [...allProds].sort(() => 0.5 - Math.random());
+        
+        // Use deterministic shuffle with a daily seed for consistency
+        const today = new Date().toDateString();
+        const seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const shuffled = deterministicShuffle(allProds, seed);
+        
         // Paginate in frontend
         const startIdx = (page - 1) * PAGE_SIZE;
         const paginated = shuffled.slice(startIdx, startIdx + PAGE_SIZE);
@@ -33,7 +66,7 @@ const ProductsPage = () => {
       })
       .catch(() => setProducts([]))
       .finally(() => setLoading(false));
-  }, [page]);
+  }, [page, isHydrated]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -59,7 +92,7 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto pt-20 px-2 sm:px-4 min-h-screen w-full">
+    <div className="max-w-6xl mt-10 mx-auto pt-8 px-2 sm:px-4 min-h-screen w-full">
       <h1 className="text-2xl sm:text-3xl font-extrabold text-cyan-300 mb-6">All Products</h1>
       {loading ? (
         <div className="flex items-center justify-center min-h-[40vh]">

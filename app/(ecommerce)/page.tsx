@@ -60,7 +60,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <main className="container mx-auto px-4 py-8 pt-12">
+      <main className="container mx-auto px-4 py-8 pt-16">
         <section className="mb-12">
           <motion.div
             className="relative overflow-hidden rounded-lg shadow-lg"
@@ -88,13 +88,13 @@ const Page = () => {
                 )}
                 {/* Content */}
                 <div className="relative z-10 bg-black/40 p-8 rounded-lg text-center max-w-lg mx-auto">
-                  <h2 className="text-3xl font-bold mb-2 text-[#00ffff] dark:text-[#00ffff] light:text-primary">
+                  <h2 className="text-3xl font-bold mb-2 text-[#00ffff]">
                     {banners[current].title}
                   </h2>
                   <p className="mb-4">{banners[current].description}</p>
                   <a
                     href={banners[current].link}
-                    className="inline-block px-6 py-2 bg-[#00ffff] dark:bg-[#00ffff] light:bg-primary text-gray-900 dark:text-gray-900 light:text-primary-foreground font-semibold rounded hover:bg-[#00cccc] dark:hover:bg-[#00cccc] light:hover:bg-primary/90 transition"
+                    className="inline-block px-6 py-2 bg-[#00ffff] text-gray-900 font-semibold rounded hover:bg-[#00cccc] transition"
                   >
                     Shop Now
                   </a>

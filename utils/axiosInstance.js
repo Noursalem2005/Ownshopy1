@@ -14,7 +14,13 @@ axiosInstance.interceptors.response.use(
   (error) => {
     // Handle errors globally
     if (error.response?.status === 401) {
-      console.error("Unauthorized! Redirecting to login...");
+      // Check if this is an auth check or wishlist endpoint
+      const isAuthCheck = error.config?.url?.includes('/api/auth/check-auth');
+      const isWishlistEndpoint = error.config?.url?.includes('/api/profile/wishlist');
+      if (!isAuthCheck && !isWishlistEndpoint) {
+        console.error("Unauthorized! Redirecting to login...");
+      }
+      // Don't log anything for auth check or wishlist 401s - they're expected for guest users
     }
     return Promise.reject(error);
   }

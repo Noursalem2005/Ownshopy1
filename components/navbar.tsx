@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useEffect, useState, useRef, use } from "react";
@@ -9,7 +8,6 @@ import { handleClientScriptLoad } from "next/script";
 import { Button } from "./ui/button";
 import { Heart, Menu, Search, ShoppingCart, X } from "lucide-react";
 import { Input } from "./ui/input";
-import { getUserSession } from "../utils/getUserSession";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,10 +21,144 @@ import { User as UserIcon, Bell, LogOut, HelpCircle, ChevronDown } from "lucide-
 import axiosInstance from "../utils/axiosInstance"; // Adjust the import path as necessary
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-type User = {
-  name?: string;
-  email?: string;
-  [key: string]: any;
+import { useAuth } from "@/context/AuthContext";
+
+// Mobile Support Dropdown Component
+const MobileSupportDropdown = ({ handleMenuItemClick }: { handleMenuItemClick: () => void }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="w-full">
+      <button
+        className="flex items-center justify-between w-full text-gray-300 hover:text-[#00ffff] py-3 text-left"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>Support</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="ml-4 flex flex-col space-y-2 py-2"
+          >
+            <Link href="/about" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              About Us
+            </Link>
+            <Link href="/contact" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Contact Us
+            </Link>
+            <Link href="/faqs" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              FAQs
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Mobile User Dropdown Component
+const MobileUserDropdown = ({ 
+  user, 
+  handleMenuItemClick, 
+  handlelogout 
+}: { 
+  user: { name?: string; email?: string; photo?: string } | null, 
+  handleMenuItemClick: () => void, 
+  handlelogout: () => void 
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="w-full">
+      <button
+        className="flex items-center justify-between w-full text-gray-300 hover:text-[#00ffff] py-3 text-left"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>Account</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="ml-4 flex flex-col space-y-2 py-2"
+          >
+            <Link href="/profile" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Profile
+            </Link>
+            <Link href="/notifications" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Notifications
+            </Link>
+            <Link href="/orders" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Orders
+            </Link>
+            <div className="w-full border-t border-gray-600/30 my-2" />
+            <button
+              onClick={() => {
+                handlelogout();
+                handleMenuItemClick();
+              }}
+              className="text-red-400 hover:text-red-300 py-2 text-sm text-left w-full"
+            >
+              Log Out
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Mobile User Account Dropdown Component (without logout)
+const MobileAccountDropdown = ({ 
+  user, 
+  handleMenuItemClick
+}: { 
+  user: { name?: string; email?: string; photo?: string } | null, 
+  handleMenuItemClick: () => void
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="w-full">
+      <button
+        className="flex items-center justify-between w-full text-gray-300 hover:text-[#00ffff] py-3 text-left"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>Account</span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="ml-4 flex flex-col space-y-2 py-2"
+          >
+            <Link href="/profile" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Profile
+            </Link>
+            <Link href="/notifications" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Notifications
+            </Link>
+            <Link href="/orders" className="text-gray-400 hover:text-[#00ffff] py-2 text-sm" onClick={handleMenuItemClick}>
+              Orders
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 const Navbar = () => {
@@ -35,7 +167,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [typingText, setTypingText] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const { user, refreshUser } = useAuth(); // Get refreshUser from AuthContext
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const { wishlist, clearWishlist } = useWishlist();
@@ -69,26 +201,18 @@ const Navbar = () => {
     try {
       const repsonse = await axiosInstance.post("/api/auth/logout");
       if (repsonse.status === 200) {
-        setUser(null);
+        // Clear user state by calling refreshUser (which will get 401 and set user to null)
+        await refreshUser();
         clearWishlist();
-        clearCart();
+        // Don't clear cart - let it persist in database for when user logs back in
+        // clearCart();
         router.push("/");
       }
     } catch (error) {
       console.error("Error logging out:", error);
     }
   };
-  useEffect(() => {
-    getUserSession().then((data) => {
-      if (data && data.user) {
-        setUser(data.user);
-        console.log("User session data:", data.user);
-      } else {
-        setUser(null);
-      }
-    });
-  }, []);
-
+  // Remove the redundant getUserSession call since AuthContext handles user state
   const router = useRouter();
 
   useEffect(() => {
@@ -165,7 +289,7 @@ const Navbar = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="dropdown-menu"
+                className="bg-gray-800"
                 align="start"
               >
                 <DropdownMenuItem className="dropdown-item">
@@ -266,7 +390,7 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  className="dropdown-menu w-52"
+                  className=" bg-gray-800 w-52"
                   align="end"
                   forceMount
                 >
@@ -334,7 +458,22 @@ const Navbar = () => {
               </>
             )}
           </div>
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Cart icon for mobile */}
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <Link href="/cart">
+                <Button size="icon" className="relative bg-transparent hover:bg-transparent p-2">
+                  <ShoppingCart className="h-5 w-5 text-gray-300 hover:text-[#00ffff] transition-colors" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#00ffff] text-gray-900 text-xs font-bold rounded-full px-1.5 py-0.5 shadow border-2 border-gray-900 animate-pulse">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            </motion.div>
+            
+            {/* Hamburger menu button */}
             <motion.button
               className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#00ffff]"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -356,7 +495,7 @@ const Navbar = () => {
           // and the name of the user
 
           <motion.div
-            className="absolute top-16 left-0 right-0 bg-[#1e293b] text-white p-4 md:hidden border-t border-gray-600 shadow-lg"
+            className="absolute top-16 left-0 right-0 bg-[#1e293b] text-white md:hidden border-t border-gray-600 shadow-lg"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
@@ -367,7 +506,7 @@ const Navbar = () => {
               <div className="flex flex-col items-stretch justify-between mb-4 w-full">
                 <form
                   onSubmit={handleSubmit}
-                  className="flex w-full flex-row items-stretch gap-2 mb-4"
+                  className="flex w-full flex-row items-stretch gap-2"
                 >
                   <Input
                     type="text"
@@ -384,9 +523,10 @@ const Navbar = () => {
                   </Button>
                 </form>
               </div>
+              
               {user && (
                 <>
-                  <div className="flex items-center space-x-3 mb-4 px-3 py-3 bg-[#0f172a] rounded-lg shadow border border-[#00ffff]/20">
+                  <div className="flex items-center space-x-3 mb-4 px-3 py-2 bg-[#0f172a] rounded-lg shadow border border-[#00ffff]/20">
                     <Avatar className="h-10 w-10 border-2 border-[#00ffff]/30">
                       {user.photo && (
                         <AvatarImage 
@@ -395,119 +535,73 @@ const Navbar = () => {
                           className="object-cover"
                         />
                       )}
-                      <AvatarFallback className="bg-[#1e293b] text-[#00ffff] font-semibold text-lg">
+                      <AvatarFallback className="bg-[#1e293b] text-[#00ffff] font-semibold">
                         {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col ml-2">
                       <span className="text-sm font-medium text-[#00ffff] leading-tight">
-                        {(user.name || "User").split(" ").slice(0, 3).join(" ")}
+                        {(user.name || "User").split(" ").slice(0, 2).join(" ")}
                       </span>
-                      <span className="text-xs text-gray-400 break-all">
-                        {user.email || "No email provided"}
+                      <span className="text-xs text-gray-400 break-all leading-tight">
+                        {user.email || "No email"}
                       </span>
                     </div>
                   </div>
                   <div className="w-full border-t border-[#00ffff]/20 mb-4" />
                 </>
               )}
+              
               <div className="flex flex-col space-y-2">
-                <Link
-                  href="/"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
+                <Link href="/" className="text-gray-300 hover:text-[#00ffff] py-3" onClick={handleMenuItemClick}>
                   Home
                 </Link>
-                <Link
-                  href="/about"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
-                  About Us
-                </Link>
-                <Link
-                  href="/contact"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
-                  Contact Us
-                </Link>
-                <Link
-                  href="/faqs"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
-                  FAQs
-                </Link>
-                <Link
-                  href="/wishlist"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
+                <div className="w-3/4 border-b border-gray-600/40 ml-0" />
+                
+                <Link href="/wishlist" className="text-gray-300 hover:text-[#00ffff] py-3" onClick={handleMenuItemClick}>
                   Liked List
                 </Link>
-                <Link
-                  href="/cart"
-                  className="text-gray-300 hover:text-[#00ffff]"
-                  onClick={handleMenuItemClick}
-                >
-                  Cart
-                </Link>
+                <div className="w-3/4 border-b border-gray-600/40 ml-0" />
+                
+                {/* Support Category with Dropdown */}
+                <MobileSupportDropdown handleMenuItemClick={handleMenuItemClick} />
+                <div className="w-3/4 border-b border-gray-600/40 ml-0" />
+                
                 {user ? (
                   <>
-                    <Link
-                      href="/profile"
-                      className="text-gray-300 hover:text-[#00ffff]"
-                      onClick={handleMenuItemClick}
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href="/notifications"
-                      className="text-gray-300 hover:text-[#00ffff]"
-                      onClick={handleMenuItemClick}
-                    >
-                      Notifications
-                    </Link>
-                    <Link
-                      href="/orders"
-                      className="text-gray-300 hover:text-[#00ffff]"
-                      onClick={handleMenuItemClick}
-                    >
-                      Orders
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      onClick={handlelogout}
-                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 w-full justify-start"
-                    >
-                      Log Out
-                    </Button>
+                    {/* User Account Category with Dropdown (without logout) */}
+                    <MobileAccountDropdown user={user} handleMenuItemClick={handleMenuItemClick} />
+                    
+                    {/* Logout separated */}
+                    <div className="pt-2 mt-2 border-t border-[#00ffff]/20">
+                      <button
+                        onClick={() => {
+                          handlelogout();
+                          handleMenuItemClick();
+                        }}
+                        className="text-red-400 hover:text-red-300 py-3 text-left w-full"
+                      >
+                        Log Out
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <Link
-                      href="/auth?type=login"
-                      className="text-gray-300 hover:text-[#00ffff]"
-                      onClick={handleMenuItemClick}
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      href="/auth?type=signup"
-                      onClick={handleMenuItemClick}
-                      className="text-gray-300 hover:text-[#00ffff]"
-                    >
-                      Sign Up
-                    </Link>
+                    <div className="flex flex-col space-y-3 pt-2">
+                      <Link href="/auth?type=login" onClick={handleMenuItemClick}>
+                        <Button className="w-full bg-transparent text-[#00ffff] border border-[#00ffff] hover:bg-[#00ffff] hover:text-black transition-colors duration-300 py-3 rounded-lg font-medium">
+                          Login
+                        </Button>
+                      </Link>
+                      
+                      <Link href="/auth?type=signup" onClick={handleMenuItemClick}>
+                        <Button className="w-full bg-[#00ffff] text-black hover:bg-[#00cccc] transition-colors duration-300 py-3 rounded-lg font-medium shadow-lg">
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </div>
                   </>
                 )}
-                
-                {/* Mobile Menu Footer */}
-                <div className="pt-4 border-t border-[#00ffff]/20">
-                  <span className="text-gray-400 text-sm">OwnShopy Mobile</span>
-                </div>
               </div>
             </div>
           </motion.div>

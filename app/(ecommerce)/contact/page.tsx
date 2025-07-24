@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { env } from "@/utils/env";
 import { 
   FaEnvelope, 
   FaPhone, 
@@ -94,8 +95,7 @@ const ContactPage = () => {
     setIsSubmitting(true);
     
     try {
-      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
-      const response = await fetch(`${baseURL}/api/contact`, {
+      const response = await fetch(env.API_CONTACT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

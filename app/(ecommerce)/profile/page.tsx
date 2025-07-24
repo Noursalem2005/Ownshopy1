@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "@/utils/axiosInstance";
+import { env } from "@/utils/env";
 import Select from "react-select";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -72,8 +73,7 @@ const Profile = () => {
         // Fix avatar URL to always be absolute
         let avatarPath = p.avatar || "";
         if (avatarPath && !avatarPath.startsWith("http")) {
-          const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
-          avatarPath = `${baseURL}/${avatarPath.replace(/^\/+/, "")}`;
+          avatarPath = env.buildAssetUrl(avatarPath);
         }
         setAvatarUrl(avatarPath);
         setBio(p.bio || "");

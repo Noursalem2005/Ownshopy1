@@ -11,6 +11,7 @@ import { FaFacebook as FacebookIcon, FaGoogle } from "react-icons/fa";
 import DynamicForm from "@/components/ui/dynamicform";
 import axiosInstance from "@/utils/axiosInstance"; // Import the Axios instance
 import { AuthContext } from "@/context/AuthContext";
+import env from "@/utils/env";
 
 const Auth = () => {
   const [isSignup, setIsSignup] = useState(true);
@@ -128,8 +129,7 @@ const Auth = () => {
   const handleFacebookLogin = async () => {
     setIsSubmitting(true);
     try {
-      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
-      window.location.href = `${baseURL}/auth/facebook`; // Redirect to your backend Facebook login route
+      window.location.href = env.FACEBOOK_AUTH_URL; // Redirect to your backend Facebook login route
     } catch (err: any) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       console.error("Error:", err.message);
@@ -142,8 +142,7 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setIsSubmitting(true);
     try {
-      const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000';
-      window.location.href = `${baseURL}/auth/google`; // Redirect to your backend Google login route
+      window.location.href = env.GOOGLE_AUTH_URL; // Redirect to your backend Google login route
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error:", error.message);
@@ -155,7 +154,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-card text-white ">
+    <div className="flex min-h-screen text-white ">
       <div className="w-full max-w-6xl mx-auto flex flex-col lg:flex-row ">
         <AnimatePresence mode="wait">
           {/* Left Side - Form Section */}
@@ -210,8 +209,8 @@ const Auth = () => {
               </div>
               <div className="flex space-x-4">
                 <Button
-                  variant="outline"
-                  className="bg-card cursor-pointer border-border w-12 h-12 sm:w-auto sm:h-auto p-2"
+                  variant="ghost"
+                  className=" cursor-pointer w-12 h-12 sm:w-auto sm:h-auto p-2"
                   disabled={isSubmitting}
                   onClick={handleFacebookLogin}
                 >
@@ -221,8 +220,8 @@ const Auth = () => {
                   </span>
                 </Button>
                 <Button
-                  variant="outline"
-                  className="bg-card cursor-pointer border-border w-12 h-12 sm:w-auto sm:h-auto p-2"
+                  variant="ghost"
+                  className="cursor-pointer border-border w-12 h-12 sm:w-auto sm:h-auto p-2"
                   disabled={isSubmitting}
                   onClick={handleGoogleLogin}
                 >

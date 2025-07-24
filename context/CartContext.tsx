@@ -12,8 +12,10 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (user && user._id) {
+      // User is logged in, fetch their cart from backend
       axiosInstance.get(`/api/cart/${user._id}`).then(res => setCart(res.data));
     } else {
+      // User is not logged in, show empty cart locally (don't clear backend)
       setCart({ items: [] });
     }
   }, [user]);

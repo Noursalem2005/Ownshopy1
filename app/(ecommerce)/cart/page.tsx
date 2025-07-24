@@ -47,7 +47,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto pt-16 px-2 sm:px-4">
+    <div className="max-w-6xl mx-auto pt-16 px-2 mt-5 sm:px-4">
       <motion.h1
         className="text-2xl sm:text-3xl font-extrabold mb-8 text-[#00ffff] tracking-tight"
         initial={{ opacity: 0, x: -30 }}

@@ -7,13 +7,10 @@ import { FaGithub, FaLinkedin, FaFacebook, FaTwitter, FaInstagram } from "react-
 
 const Footer = () => {
   return (
-    <motion.footer
-      className="bg-card text-card-foreground border-t border-border"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+    <footer
+      className="text-card-foreground border-t mt-10 border-border"
     >
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:py-10 lg:px-8">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="flex flex-col items-center justify-center col-span-1">
             <div className="flex items-center justify-center space-x-3">
@@ -24,18 +21,18 @@ const Footer = () => {
                 height={75}
                 className="rounded-md border-1 border-[#00ffff] shadow-lg object-cover"
               />
-              <motion.span className="text-2xl font-bold bg-clip-text bg-gradient-to-r from-primary to-primary/80">
+              <span className="text-2xl font-bold bg-clip-text bg-gradient-to-r from-[#2afdfd] to-[#00ffff] text-transparent">
                 OwnShopy
-              </motion.span>
+              </span>
             </div>
-            <p className="text-muted-foreground text-base text-left md:text-center xl:text-center mt-4">
+            <p className="text-muted-foreground text-base text-left md:text-center xl:text-center mt-3">
               Your one-stop shop for the latest products, best deals, and
               amazing customer service.
             </p>
-            <div className="flex items-center justify-center space-x-3 mt-4">
+            <div className="flex items-center justify-center space-x-3 mt-3">
               <motion.a
                 href="https://facebook.com"
-                className="text-muted-foreground hover:text-primary"
+                className="text-muted-foreground hover:text-[#00ffff]"
                 whileTap={{ y: 0 }}
                 whileHover={{ y: -2 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -71,13 +68,13 @@ const Footer = () => {
               </motion.a>
             </div>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
+          <div className="mt-8 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
             <div className="md:grid md grid-cols-2 md:gap-8">
               <div>
                 <h3 className="text-sm font-semibold text-gray-200 tracking-wider uppercase">
                   Products
                 </h3>
-                <ul className="mt-4 space-y-4">
+                <ul className="mt-3 space-y-3">
                   {[
                     {
                       label: "smartphones",
@@ -110,11 +107,11 @@ const Footer = () => {
                   ))}
                 </ul>
               </div>
-              <div className="mt-12 md:mt-0">
+              <div className="mt-8 md:mt-0">
                 <h3 className="text-sm font-semiold text-gray-200 tracking-wider uppercase">
                   Support
                 </h3>
-                <ul className="mt-4 space-y-4">
+                <ul className="mt-3 space-y-3">
                   <motion.li whileHover={{ x: 2, color: "#00ffff" }}>
                     <Link
                       href="/contact"
@@ -155,7 +152,7 @@ const Footer = () => {
                 <h3 className="text-sm font-semibold text-gray-200 tracking-wider uppercase">
                   Company
                 </h3>
-                <ul className="mt-4 space-y-4">
+                <ul className="mt-3 space-y-3">
                   <motion.li whileHover={{ x: 2, color: "#00ffff" }}>
                     <Link
                       href="/about"
@@ -190,32 +187,41 @@ const Footer = () => {
                   </motion.li>
                 </ul>
               </div>
-              <div className="mt-12 md:mt-0">
+              <div className="mt-8 md:mt-0">
                 <h3 className="text-sm font-semibold text-gray-200 tracking-wider uppercase">
                   Legal
                 </h3>
-                <ul className="mt-4 space-y-4">
-                  {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(
-                    (item) => (
-                      <motion.li
-                        key={item}
-                        whileHover={{ x: 2, color: "#00ffff" }}
-                      >
-                        <motion.a
-                          className="text-base text-gray-400 hover:text-[#00ffff] transition-colors"
-                          href={`/${item.toLowerCase().replace(/ /g, "-")}`}
-                        >
-                          {item}
-                        </motion.a>
-                      </motion.li>
-                    )
-                  )}
+                <ul className="mt-3 space-y-3">
+                  <motion.li whileHover={{ x: 2, color: "#00ffff" }}>
+                    <Link
+                      href="/privacy-policy"
+                      className="text-base text-gray-400 hover:text-[#00ffff] transition-colors"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 2, color: "#00ffff" }}>
+                    <Link
+                      href="/terms-of-use"
+                      className="text-base text-gray-400 hover:text-[#00ffff] transition-colors"
+                    >
+                      Terms of Use
+                    </Link>
+                  </motion.li>
+                  <motion.li whileHover={{ x: 2, color: "#00ffff" }}>
+                    <Link
+                      href="/cookie-policy"
+                      className="text-base text-gray-400 hover:text-[#00ffff] transition-colors"
+                    >
+                      Cookie Policy
+                    </Link>
+                  </motion.li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
-        <div className="mt-12 border-t border-gray-800 pt-8">
+        <div className="mt-8 border-t border-gray-800 pt-6">
           <p className="text-base text-gray-400 xl:text-center">
             &copy; {new Date().getFullYear()} OwnShopy. All rights reserved.
           </p>
@@ -255,7 +261,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 export default Footer;

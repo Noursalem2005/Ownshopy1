@@ -7,6 +7,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import axiosInstance from "@/utils/axiosInstance";
 
+// Extend Window interface to include ApplePaySession
+declare global {
+  interface Window {
+    ApplePaySession?: any;
+  }
+  // eslint-disable-next-line no-var
+  var ApplePaySession: any;
+}
+
 interface ApplePayPaymentProps {
   amount: number;
   orderId: string;
