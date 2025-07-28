@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import axios from "@/utils/axiosInstance";
@@ -34,7 +34,7 @@ const sortOptions = [
   { value: "newest", label: "Newest" },
 ];
 
-export default function SearchPage() {
+function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("searchTerm") || "");
@@ -352,5 +352,17 @@ export default function SearchPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-300">Loading search...</div>
+      </div>
+    }>
+      <SearchPageContent />
+    </Suspense>
   );
 }
