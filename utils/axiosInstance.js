@@ -6,6 +6,23 @@ const axiosInstance = axios.create({
   withCredentials: true, // Include cookies in requests
 });
 
+// Request interceptor to add token to headers
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Try to get token from localStorage as fallback
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Add a response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
@@ -19,6 +36,10 @@ axiosInstance.interceptors.response.use(
       const isWishlistEndpoint = error.config?.url?.includes('/api/profile/wishlist');
       if (!isAuthCheck && !isWishlistEndpoint) {
         console.error("Unauthorized! Redirecting to login...");
+        // Clear invalid token
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('auth_token');
+        }
       }
       // Don't log anything for auth check or wishlist 401s - they're expected for guest users
     }
