@@ -1,9 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
-  "installCommand": "npm install",
   "env": {
     "NEXT_PUBLIC_APP_NAME": "OwnShopy",
     "NEXT_PUBLIC_APP_DESCRIPTION": "Premium E-commerce Platform"

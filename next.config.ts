@@ -8,8 +8,10 @@ const nextConfig: NextConfig = {
       // add other domains as needed
     ],
   },
-  // Disable static optimization for dynamic pages
-  output: 'standalone',
+  // Remove standalone output for Vercel deployment
+  experimental: {
+    esmExternals: 'loose'
+  }
 };
 
 export default nextConfig;
