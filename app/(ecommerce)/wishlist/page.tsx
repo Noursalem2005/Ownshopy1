@@ -45,7 +45,7 @@ const WishlistPage = () => {
       setWishlistLoading(false);
     };
     fetchWishlist();
-  }, []); 
+  }, []);
   // Drag-and-drop logic
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })

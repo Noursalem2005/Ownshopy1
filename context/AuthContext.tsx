@@ -14,12 +14,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(true);
     try {
       const res = await axiosInstance.get("/api/auth/check-auth", { withCredentials: true });
-      setUser(res.data.user);
+      // If backend indicates no authenticated user, set null. Caller may receive a resolved
+      // neutral response with status 401 (handled in axios interceptor) so check data safely.
+      setUser(res?.data?.user ?? null);
     } catch (error: any) {
-      // Silently handle 401 errors for guest users - this is expected
-      if (error.response?.status !== 401) {
-        console.error('Auth check failed:', error);
-      }
+      // Auth check failed (guest or network). Do not spam console for expected guest 401s.
       setUser(null);
     } finally {
       setLoading(false);

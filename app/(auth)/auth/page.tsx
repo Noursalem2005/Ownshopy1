@@ -112,12 +112,6 @@ const AuthContent = () => {
       const data = response.data;
       console.log("Success:", data);
 
-      // Store token for cross-origin requests if provided
-      if (data.token) {
-        localStorage.setItem('auth_token', data.token);
-        console.log("🔑 Token stored in localStorage");
-      }
-
       // Redirect user to the appropriate page
       if (isSignup) {
         router.push("/verfiy-code"); // Replace with your verification page route

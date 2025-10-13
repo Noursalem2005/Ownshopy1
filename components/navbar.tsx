@@ -328,7 +328,7 @@ const Navbar = () => {
                   type="text"
                   placeholder={typingText || "Search..."}
                   value={searchQuery}
-                  className="search-input"
+                  className="search-input text-white placeholder:text-gray-400"
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                   }}
@@ -512,7 +512,7 @@ const Navbar = () => {
                     type="text"
                     placeholder={typingText || "Search..."}
                     value={searchQuery}
-                    className="search-input flex-1"
+                    className="search-input flex-1 text-white placeholder:text-gray-400"
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <Button

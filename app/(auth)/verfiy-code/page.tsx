@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation"; // For navigation
 import { toast } from "sonner"; // Import the toast function
 import axiosInstance from "../../../utils/axiosInstance"; // Adjust the path to your axios instance
+import { useAuth } from "../../../context/AuthContext";
 import { Button } from "../../../components/ui/button"; // Adjust the path to your Button component
 
 const VerifyCode: React.FC = () => {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -30,7 +32,17 @@ const VerifyCode: React.FC = () => {
 
       if (response.data.success) {
         toast.success("Verification successful! Redirecting to Home...");
-        router.push("/"); // Redirect to login page after success
+        try {
+          // Refresh the auth context so the UI picks up the newly-signed-in user
+          // call and await refresh so nav/buttons update before navigating
+          await refreshUser();
+        } catch (err) {
+          // if refresh fails, continue to redirect — user can refresh manually as fallback
+          // don't spam console in prod; keep minimal logging for debugging
+          // console.debug('refreshUser failed after verification', err);
+        }
+
+        router.push("/"); // Redirect to home after success
       } else {
         toast.error(response.data.message || "Invalid verification code. Please try again.");
       }
