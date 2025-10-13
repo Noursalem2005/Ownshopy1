@@ -36,10 +36,9 @@ const VerifyCode: React.FC = () => {
           // Refresh the auth context so the UI picks up the newly-signed-in user
           // call and await refresh so nav/buttons update before navigating
           await refreshUser();
-        } catch (err) {
+        } catch {
           // if refresh fails, continue to redirect — user can refresh manually as fallback
-          // don't spam console in prod; keep minimal logging for debugging
-          // console.debug('refreshUser failed after verification', err);
+          // keep minimal logging to avoid noisy output in production
         }
 
         router.push("/"); // Redirect to home after success
