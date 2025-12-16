@@ -95,13 +95,14 @@ const Chatbot = () => {
         userId: `user_${Date.now()}`
       });
 
-      // Realistic typing delay
-      const typingDelay = Math.min(Math.max(response.data.response.length * 25, 1000), 2000);
+      // Ensure response.data.response is a valid string
+      const botResponse = response.data.response || "Sorry, I couldn't process that. Please try again.";
+      const typingDelay = Math.min(Math.max(botResponse.length * 25, 1000), 2000);
 
       setTimeout(() => {
         const botMessage: Message = {
           id: `bot-${messageIdCounter + 1}`,
-          text: response.data.response,
+          text: botResponse,
           isBot: true,
           timestamp: new Date(),
           action: response.data.action

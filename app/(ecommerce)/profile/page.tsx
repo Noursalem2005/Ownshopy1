@@ -145,13 +145,7 @@ const Profile = () => {
       formData.append("newsletter", String(newsletter));
       if (avatar) {
         formData.append("avatar", avatar);
-        console.log("[FRONTEND] Appending avatar file:", avatar);
-      } else {
-        console.log("[FRONTEND] No avatar file to upload");
-      }
-      // Debug: log FormData keys
-      for (const pair of formData.entries()) {
-        console.log("[FRONTEND] FormData:", pair[0], pair[1]);
+        // avatar appended
       }
       await axiosInstance.put("/api/profile", formData);
       setSaveMsg("Profile updated!");

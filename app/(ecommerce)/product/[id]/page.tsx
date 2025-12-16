@@ -38,45 +38,41 @@ const ProductPage = () => {
     setLoading(true);
     axiosInstance.get(`/api/products/${id}`)
       .then(res => {
-        setProduct(res.data);
-        console.log("[Related Debug] Current product:", res.data);
+  setProduct(res.data);
         if (res.data.category) {
           axiosInstance.get(`/api/products?limit=1000`).then((allRes) => {
             const allProducts = allRes.data.products.filter((p: any) => p._id !== res.data._id);
-            console.log("[Related Debug] All products (excluding current):", allProducts);
             const sameCat = allProducts.filter((p: any) => p.category === res.data.category);
-            console.log("[Related Debug] Same category products:", sameCat);
             const diffCatArr = allProducts.filter((p: any) => p.category !== res.data.category);
-            console.log("[Related Debug] Different category products:", diffCatArr);
             // Shuffle and pick up to 2 random from same category
             const shuffledSame = sameCat.sort(() => 0.5 - Math.random());
             const selectedSameFinal = shuffledSame.slice(0, 2);
-            console.log("[Related Debug] Selected same category (up to 2):", selectedSameFinal);
+            // selectedSameFinal computed
             // Pick 1 random from a different category
             let diffCatFinal = null;
             if (diffCatArr.length > 0) {
               const shuffledDiff = diffCatArr.sort(() => 0.5 - Math.random());
               diffCatFinal = shuffledDiff.find((p: any) => !selectedSameFinal.some((s: any) => s._id === p._id));
-              console.log("[Related Debug] Selected different category:", diffCatFinal);
+              // selected different category computed
             } else {
-              console.log("[Related Debug] No different category products available.");
+              // no different category products available
             }
             let relatedArr = diffCatFinal ? [...selectedSameFinal, diffCatFinal] : selectedSameFinal;
             // Remove any accidental duplicates (shouldn't happen, but for safety)
             relatedArr = relatedArr.filter((p: any, idx: number, arr: any[]) => arr.findIndex((x: any) => x._id === p._id) === idx);
-            console.log("[Related Debug] Final related products:", relatedArr);
+            // final related products ready
             setRelated(relatedArr);
           }).catch((err) => {
-            console.log("[Related Debug] Error fetching related products:", err);
+            console.error("Error fetching related products:", err?.message || err);
             setRelated([]);
           });
         } else {
-          console.log("[Related Debug] No category for current product.");
+          // no category for current product
           setRelated([]);
         }
       })
       .catch((err) => {
-        console.log("[Related Debug] Error fetching product:", err);
+        console.error("Error fetching product:", err?.message || err);
         setProduct(null)
       })
       .finally(() => setLoading(false));

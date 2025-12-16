@@ -69,7 +69,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [user, mounted]);
 
   const applyTheme = (newTheme: 'light' | 'dark') => {
-    console.log('Applying theme:', newTheme);
     
     // Remove existing theme classes
     document.documentElement.classList.remove('light', 'dark');
@@ -77,7 +76,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Add new theme class
     document.documentElement.classList.add(newTheme);
     
-    console.log('Theme classes applied:', document.documentElement.classList.toString());
+  // Theme classes applied; no verbose logging in production
     
     // Update CSS custom properties using RGB space-separated values
     if (newTheme === 'dark') {
@@ -124,7 +123,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.setProperty('--ring', '37 99 235');             // Blue ring
     }
     
-    console.log('Theme variables set for:', newTheme);
+    // Theme variables updated
   };
 
   const setTheme = async (newTheme: 'light' | 'dark') => {
@@ -153,7 +152,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
-    console.log('Toggling theme from', theme, 'to', newTheme);
     setTheme(newTheme);
   };
 

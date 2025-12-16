@@ -17,7 +17,6 @@ interface Message {
 }
 
 const ChatbotWrapper = () => {
-  console.log('ChatbotWrapper component rendering...');
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -57,11 +56,10 @@ const ChatbotWrapper = () => {
   }, [isOpen]);
 
   const toggleOpen = () => {
-    console.log('ChatbotWrapper toggleOpen called, current isOpen:', isOpen);
     setIsOpen(!isOpen);
     setHasNewMessage(false);
     setIsMinimized(false);
-    console.log('ChatbotWrapper toggleOpen completed, new isOpen will be:', !isOpen);
+    // toggled chatbot open state
   };
 
   const sendMessage = async () => {

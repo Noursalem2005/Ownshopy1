@@ -6,7 +6,6 @@ const SimpleChatTest = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleOpen = () => {
-    console.log('Simple chat toggle clicked!', isOpen);
     setIsOpen(!isOpen);
   };
 

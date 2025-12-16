@@ -37,6 +37,7 @@ const WishlistPage = () => {
     const fetchWishlist = async () => {
       setWishlistLoading(true);
       try {
+        // backend routes are mounted under /api/profile in the Express app
         const res = await axiosInstance.get("/api/profile/wishlist");
         setWishlist(res.data.wishlist || []);
       } catch {

@@ -120,14 +120,12 @@ const CookiePolicy = () => {
 
   const savePreferences = () => {
     // In a real app, you would save these preferences to localStorage or send to server
-    console.log('Saving cookie preferences:', cookiePreferences);
     alert('Cookie preferences saved!');
   };
 
   const clearAllCookies = () => {
     if (confirm('Are you sure you want to clear all non-essential cookies? This will reset your preferences and log you out.')) {
       // In a real app, you would clear cookies here
-      console.log('Clearing all cookies');
       alert('Cookies cleared!');
     }
   };

@@ -40,7 +40,6 @@ const OrdersPage = () => {
       let response;
       if (user) {
         // Authenticated user - also pass email to catch guest orders
-        console.log("Fetching orders for authenticated user:", user.email);
         const params = new URLSearchParams();
         if (user.email) params.append('email', user.email);
         const queryString = params.toString();
@@ -54,17 +53,16 @@ const OrdersPage = () => {
         }
         
         const guestEmail = localStorage.getItem('guestEmail') || sessionStorage.getItem('guestEmail');
-        console.log("Fetching guest orders for email:", guestEmail);
         if (guestEmail) {
           response = await axiosInstance.get(`/api/orders?email=${encodeURIComponent(guestEmail)}`);
         } else {
-          console.log("No guest email found, showing empty orders");
+          // no guest email found
           setOrders([]);
           setLoading(false);
           return;
         }
       }
-      console.log("Orders response:", response.data);
+      // orders response received
       setOrders(response.data);
     } catch (error) {
       console.error("Failed to fetch orders:", error);

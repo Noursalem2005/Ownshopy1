@@ -46,17 +46,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const clearCart = async () => {
     if (user?._id) {
       try {
-        console.log("Clearing cart for user:", user._id);
         // Clear cart on backend using the correct endpoint
         await axiosInstance.delete(`/api/cart/${user._id}/clear`);
-        console.log("Cart cleared on backend");
+        // cart cleared on backend
       } catch (error) {
         console.error("Failed to clear cart on backend:", error);
       }
     }
     // Clear cart in local state
     setCart({ items: [] });
-    console.log("Cart cleared locally");
+    // cart cleared locally
   };
 
   return (

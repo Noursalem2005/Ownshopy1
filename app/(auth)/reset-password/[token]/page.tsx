@@ -39,8 +39,7 @@ const ResetPasswordWithToken: React.FC = () => {
     setIsSubmitting(true);
   
     try {
-      // Log the token for debugging
-      console.log("Token being sent:", token);
+  // Do not log tokens or other sensitive values
   
       // Send the token as a URL parameter and the password in the request body
       const response = await axiosInstance.post(`/api/auth/reset-password/${token}`, {

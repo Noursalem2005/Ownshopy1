@@ -98,7 +98,7 @@ const AuthContent = () => {
     setIsError(false);
     setErrorMessage("");
     try {
-      console.log("Form Data:", formData);
+  // form data prepared for submission
       const endpoint = isSignup ? "/api/auth/signup" : "/api/auth/login";
       const response = await axiosInstance.post(endpoint, formData);
 
@@ -110,7 +110,7 @@ const AuthContent = () => {
       }
 
       const data = response.data;
-      console.log("Success:", data);
+  // submission successful
 
       // Redirect user to the appropriate page
       if (isSignup) {
