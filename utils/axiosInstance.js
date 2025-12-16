@@ -1,7 +1,9 @@
 import axios from "axios";
 
-// Prefer a local backend when running the frontend in the browser on localhost.
-let baseURL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000";
+// Resolve backend base URL with sensible fallbacks.
+// Priority: env override -> localhost (when on local dev) -> production Azure API.
+let baseURL = process.env.NEXT_PUBLIC_BASE_URL || "https://ownshopy-aa-hwbdctfwhdephyg4.uaenorth-01.azurewebsites.net";
+
 // In browser dev, prefer the local backend when running on localhost/127.0.0.1
 if (typeof window !== 'undefined' && window.location && window.location.hostname) {
   const host = window.location.hostname;

@@ -87,17 +87,20 @@ const ChatbotWrapper = () => {
         }))
       });
 
+      // Ensure response.data.response is a valid string before using .length
+      const botResponse = response.data?.response || "Sorry, I couldn't process that. Please try again.";
+
       // Realistic typing delay based on message length
-      const typingDelay = Math.min(Math.max(response.data.response.length * 30, 800), 3000);
+      const typingDelay = Math.min(Math.max(botResponse.length * 30, 800), 3000);
 
       setTimeout(() => {
         const botMessage: Message = {
           id: `bot-${messageIdCounter + 1}`,
-          text: response.data.response,
+          text: botResponse,
           isBot: true,
           timestamp: new Date(),
-          category: response.data.category,
-          confidence: response.data.confidence
+          category: response.data?.category,
+          confidence: response.data?.confidence
         };
 
         setMessages(prev => [...prev, botMessage]);
